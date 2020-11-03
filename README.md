@@ -1,4 +1,4 @@
-# Authenticaion example
+# Authentication example
 
 Exemple d'authentification d'un utilisateur.
 
