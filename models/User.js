@@ -1,12 +1,9 @@
-const { Sequelize, Model, DataTypes } = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
+const debug = require("debug")("authenticaiton-example:user");
 const bcrypt = require("bcrypt");
-const debug = require("debug")("session-example:User");
+const sequelize = require("./db.js");
 
 const saltRounds = 10;
-
-const sequelize = new Sequelize("sqlite::memory:", {
-  logging: debug,
-});
 
 class User extends Model {
   async validPassword(passwordToTest) {
@@ -23,20 +20,22 @@ User.init(
 );
 
 (async () => {
-  await sequelize.sync();
+  await User.sync();
   const adminPasswordHash = await bcrypt.hash("My admin password", saltRounds);
   const otherUserPasswordHash = await bcrypt.hash(
     "My other user password",
     saltRounds
   );
-  await User.create({
-    username: "admin",
-    passwordHash: adminPasswordHash,
-  });
-  await User.create({
-    username: "otherUser",
-    passwordHash: otherUserPasswordHash,
-  });
+  await User.bulkCreate([
+    {
+      username: "admin",
+      passwordHash: adminPasswordHash,
+    },
+    {
+      username: "otherUser",
+      passwordHash: otherUserPasswordHash,
+    },
+  ]);
 })();
 
 module.exports = User;

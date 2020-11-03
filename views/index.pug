@@ -1,12 +1,8 @@
 extends layout
 
 block content
-  main.container
-    h1= title
-    p Welcome !
-    if user
-      .alert.alert-success You are authenticated as #{user.username}!
-      a(href="/logout") Logout
-    else
-      .alert.alert-warning You are not authenticated.
-      a(href="/login") Please login
+  h1= title
+  if newlyAuthenticated
+    .alert.alert-success.alert-dismissible.fade.show You are authenticated as #{user.username}!
+      button(type="button" class="btn-close" data-dismiss="alert" aria-label="Close")
+  p Welcome !

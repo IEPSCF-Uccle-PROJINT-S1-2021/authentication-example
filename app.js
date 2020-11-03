@@ -8,9 +8,11 @@ const session = require("express-session");
 
 const LocalStrategy = require("passport-local").Strategy;
 
-const User = require("./models/User");
+const User = require("./models/user");
+const Book = require("./models/book");
+
 const indexRouter = require("./routes/index");
-const loginRouter = require("./routes/login");
+const bookRouter = require("./routes/book");
 
 const app = express();
 
@@ -59,7 +61,7 @@ passport.deserializeUser(async (username, done) => {
 });
 
 app.use("/", indexRouter);
-app.use("/", loginRouter);
+app.use("/books", bookRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
