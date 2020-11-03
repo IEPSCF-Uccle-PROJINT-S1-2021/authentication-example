@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  main.container
+    h1= title
+    p Welcome !
+    if user
+      .alert.alert-success You are authenticated as #{user.username}!
+      a(href="/logout") Logout
+    else
+      .alert.alert-warning You are not authenticated.
+      a(href="/login") Please login
