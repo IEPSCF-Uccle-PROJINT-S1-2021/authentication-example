@@ -8,7 +8,7 @@ const session = require("express-session");
 
 const LocalStrategy = require("passport-local").Strategy;
 
-const { User } = require("./models/user");
+const User = require("./models/user");
 const Book = require("./models/book");
 require("./models/populateDb");
 

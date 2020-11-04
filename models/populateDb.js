@@ -1,36 +1,12 @@
 const sequelize = require("./db");
 const Book = require("./book");
-const { User, Role, Permission } = require("./user");
+const User = require("./user");
 const bcrypt = require("bcrypt");
 
 const saltRounds = 10;
 
 (async () => {
   await sequelize.sync();
-
-  const [
-    listBookPerm,
-    viewBookDetailsPerm,
-    editBookPerm,
-    deleteBookPerm,
-  ] = await Permission.bulkCreate([
-    { name: "listBooks" },
-    { name: "viewBookDetails" },
-    { name: "editBook" },
-    { name: "deleteBook" },
-  ]);
-
-  const [readerRole, librarianRole, adminRole] = await Role.bulkCreate([
-    { name: "user" },
-    { name: "librarian" },
-    { name: "admin" },
-  ]);
-
-  await Promise.all([
-    readerRole.addPermissions([listBookPerm, viewBookDetailsPerm]),
-    librarianRole.addPermission([listBookPerm, viewBookDetailsPerm, editBookPerm]),
-    adminRole.addPermission([listBookPerm, viewBookDetailsPerm, editBookPerm, deleteBookPerm]),
-  ]);
 
   const arthurPasswordHash = await bcrypt.hash("Arthur password", saltRounds);
   const louisPasswordHash = await bcrypt.hash("Louis password", saltRounds);
@@ -51,12 +27,6 @@ const saltRounds = 10;
       username: "ron",
       passwordHash: ronPasswordHash,
     },
-  ]);
-
-  await Promise.all([
-    arthur.setRoles([adminRole]),
-    louis.setRoles([librarianRole]),
-    ron.setRoles([readerRole])
   ]);
 
   await Book.bulkCreate([
