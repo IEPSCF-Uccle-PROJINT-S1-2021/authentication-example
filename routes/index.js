@@ -30,6 +30,7 @@ router.post("/login", (req, res, next) => {
       req.session.authenticationFailed = true;
       return res.redirect("/login");
     }
+    delete req.session.nextUrl;
     req.session.regenerate((err2) => {
       if (err2) {
         return next(err2);

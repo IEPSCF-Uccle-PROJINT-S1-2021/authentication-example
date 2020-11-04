@@ -8,8 +8,9 @@ const session = require("express-session");
 
 const LocalStrategy = require("passport-local").Strategy;
 
-const User = require("./models/user");
+const { User } = require("./models/user");
 const Book = require("./models/book");
+require("./models/populateDb");
 
 const indexRouter = require("./routes/index");
 const bookRouter = require("./routes/book");
@@ -33,7 +34,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // authentication setup
 app.use(passport.initialize());
-app.use(passport.session({ pauseStream: true })); // pauseStream is needed because passport.deserializeUser uses async.
+// pauseStream is needed because passport.deserializeUser uses async.
+app.use(passport.session({ pauseStream: true }));
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
@@ -53,7 +55,9 @@ passport.serializeUser((user, done) => {
 });
 passport.deserializeUser(async (username, done) => {
   try {
-    const user = await User.findByPk(username);
+    const user = await User.findByPk(username, {
+      include: { all: true, nested: true },
+    });
     done(null, user);
   } catch (error) {
     done(error);

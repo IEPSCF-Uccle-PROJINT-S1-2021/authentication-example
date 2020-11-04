@@ -1,16 +1,45 @@
 const { Model, DataTypes } = require("sequelize");
-const debug = require("debug")("authenticaiton-example:user");
-const bcrypt = require("bcrypt");
 const sequelize = require("./db.js");
+const bcrypt = require("bcrypt");
 
-const saltRounds = 10;
+class Permission extends Model {}
+Permission.init(
+  {
+    name: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+    },
+  },
+  { sequelize, modelName: "permission" }
+);
+
+class Role extends Model {}
+Role.init(
+  {
+    name: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+    },
+  },
+  { sequelize, modelName: "role" }
+);
+
+Role.belongsToMany(Permission, { through: "role_permissions" });
+Permission.belongsToMany(Role, { through: "role_permissions" });
 
 class User extends Model {
   async validPassword(passwordToTest) {
     return bcrypt.compare(passwordToTest, this.passwordHash);
   }
-}
 
+  can(permissionName) {
+    return this.roles.some((role) => {
+      return role.permissions.some((perm) => {
+        return perm.name === permissionName;
+      });
+    });
+  }
+}
 User.init(
   {
     username: { type: DataTypes.STRING, primaryKey: true },
@@ -19,23 +48,7 @@ User.init(
   { sequelize, modelName: "user" }
 );
 
-(async () => {
-  await User.sync();
-  const adminPasswordHash = await bcrypt.hash("My admin password", saltRounds);
-  const otherUserPasswordHash = await bcrypt.hash(
-    "My other user password",
-    saltRounds
-  );
-  await User.bulkCreate([
-    {
-      username: "admin",
-      passwordHash: adminPasswordHash,
-    },
-    {
-      username: "otherUser",
-      passwordHash: otherUserPasswordHash,
-    },
-  ]);
-})();
+User.belongsToMany(Role, { through: "user_roles" });
+Role.belongsToMany(User, { through: "user_roles" });
 
-module.exports = User;
+module.exports = { User, Role, Permission };
