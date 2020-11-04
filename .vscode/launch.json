@@ -6,7 +6,6 @@
   "configurations": [
     {
       "console": "integratedTerminal",
-      "envFile": "${workspaceFolder}/.env",
       "internalConsoleOptions": "neverOpen",
       "name": "nodemon",
       "program": "${workspaceFolder}/bin/www",
